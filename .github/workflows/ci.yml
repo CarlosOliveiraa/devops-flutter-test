@@ -59,12 +59,37 @@ jobs:
             exit 1
           fi
 
-      - name: Report test results
-        uses: dorny/test-reporter@v1.9.1
+      - name: Upload test results
+        uses: actions/upload-artifact@v2
         with:
           name: test-results
           path: test-results.json
-          reporter: flutter-json
+
+      - name: Report test results
+        uses: actions/github-script@v5
+        with:
+          script: |
+            const fs = require('fs');
+            const result = fs.readFileSync('test-results.json', 'utf8');
+            const annotations = JSON.parse(result).tests.map(test => ({
+              path: test.file,
+              start_line: test.line,
+              end_line: test.line,
+              annotation_level: test.success ? 'notice' : 'failure',
+              message: test.message,
+            }));
+            github.rest.checks.create({
+              ...github.context.repo,
+              name: 'test-results',
+              head_sha: github.context.sha,
+              status: 'completed',
+              conclusion: 'success',
+              output: {
+                title: 'Test Results',
+                summary: `Ran ${annotations.length} tests.`,
+                annotations: annotations.slice(0, 50) // GitHub has a limit of 50 annotations per request
+              }
+            });
 
       - name: Report coverage
         uses: VeryGoodOpenSource/very_good_coverage@v1.1.1
