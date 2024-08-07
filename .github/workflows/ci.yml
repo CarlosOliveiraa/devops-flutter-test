@@ -34,6 +34,14 @@ jobs:
             echo "test-results.json not found!"
             exit 1
           fi
+      - name: Validate JSON format
+        run: |
+          sudo apt-get install -y jq
+          cat test-results.json | jq . > /dev/null
+          if [ $? -ne 0 ]; then
+            echo "Invalid JSON format in test-results.json"
+            exit 1
+          fi
       - uses: dorny/test-reporter@v1.4.2
         with:
           name: test-results
