@@ -22,10 +22,13 @@ jobs:
       - uses: subosito/flutter-action@v1
         with:
           channel: "stable"
-      - run: flutter pub get   
+      - run: flutter pub get
+      - name: Install Dart SDK
+        run: sudo apt-get install dart
+      - run: dart pub get
       - run: flutter analyze
-      - run: flutter format --output=none --set-exit-if-changed lib/
-      - run: flutter format --output=none --set-exit-if-changed test/
+      - run: dart format --output=none --set-exit-if-changed lib/
+      - run: dart format --output=none --set-exit-if-changed test/
       - run: flutter test --coverage
       - run: flutter test --machine > test-results.json
       - uses: dorny/test-reporter@v1.4.2
@@ -35,4 +38,4 @@ jobs:
           reporter: flutter-json
       - uses: VeryGoodOpenSource/very_good_coverage@v1.1.1
         with:
-          min_coverage: 0     
+          min_coverage: 0
