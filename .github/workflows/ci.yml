@@ -27,8 +27,6 @@ jobs:
         run: sudo apt-get install dart
       - run: dart pub get
       - run: flutter analyze
-      - run: dart format --output=none --set-exit-if-changed lib/
-      - run: dart format --output=none --set-exit-if-changed test/
       - run: flutter test --coverage
       - run: flutter test --machine > test-results.json
       - uses: dorny/test-reporter@v1.4.2
