@@ -60,7 +60,7 @@ jobs:
           fi
 
       - name: Report test results
-        uses: dorny/test-reporter@v1.4.2
+        uses: dorny/test-reporter@v1.9.1
         with:
           name: test-results
           path: test-results.json
