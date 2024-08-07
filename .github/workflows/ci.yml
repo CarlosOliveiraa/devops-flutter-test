@@ -15,83 +15,17 @@ jobs:
     name: Run Flutter analyze and test
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Setup Java
-        uses: actions/setup-java@v1
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v1
         with:
           java-version: "12.x"
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v1
+      - uses: subosito/flutter-action@v1
         with:
           channel: "stable"
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Analyze code
-        run: flutter analyze
-
-      - name: Run tests with coverage
-        run: flutter test --coverage
-
-      - name: Generate test results in machine format
-        run: flutter test --machine > test-results.json
-
-      - name: Display test results
-        run: cat test-results.json
-
-      - name: Check if test-results.json exists
-        run: |
-          if [ ! -f test-results.json ]; then
-            echo "test-results.json not found!"
-            exit 1
-          fi
-
-      - name: Validate JSON format
-        run: |
-          sudo apt-get install -y jq
-          cat test-results.json | jq . > /dev/null
-          if [ $? -ne 0 ]; then
-            echo "Invalid JSON format in test-results.json"
-            exit 1
-          fi
-
-      - name: Upload test results
-        uses: actions/upload-artifact@v2
-        with:
-          name: test-results
-          path: test-results.json
-
-      - name: Report test results
-        uses: actions/github-script@v5
-        with:
-          script: |
-            const fs = require('fs');
-            const result = fs.readFileSync('test-results.json', 'utf8');
-            const annotations = JSON.parse(result).tests.map(test => ({
-              path: test.file,
-              start_line: test.line,
-              end_line: test.line,
-              annotation_level: test.success ? 'notice' : 'failure',
-              message: test.message,
-            }));
-            github.rest.checks.create({
-              ...github.context.repo,
-              name: 'test-results',
-              head_sha: github.context.sha,
-              status: 'completed',
-              conclusion: 'success',
-              output: {
-                title: 'Test Results',
-                summary: `Ran ${annotations.length} tests.`,
-                annotations: annotations.slice(0, 50) // GitHub has a limit of 50 annotations per request
-              }
-            });
-
-      - name: Report coverage
-        uses: VeryGoodOpenSource/very_good_coverage@v1.1.1
+      - run: flutter pub get   
+      - run: flutter analyze
+      - run: flutter test --coverage
+      - run: flutter test --machine > test-results.json
+      - uses: VeryGoodOpenSource/very_good_coverage@v1.1.1
         with:
           min_coverage: 0
