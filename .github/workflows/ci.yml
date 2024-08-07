@@ -15,25 +15,41 @@ jobs:
     name: Run Flutter analyze and test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-java@v1
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Java
+        uses: actions/setup-java@v1
         with:
           java-version: "12.x"
-      - uses: subosito/flutter-action@v1
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v1
         with:
           channel: "stable"
-      - run: flutter pub get
-      - run: flutter analyze
-      - run: flutter test --coverage
-      - run: flutter test --machine > test-results.json
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze code
+        run: flutter analyze
+
+      - name: Run tests with coverage
+        run: flutter test --coverage
+
+      - name: Generate test results in machine format
+        run: flutter test --machine > test-results.json
+
       - name: Display test results
         run: cat test-results.json
+
       - name: Check if test-results.json exists
         run: |
           if [ ! -f test-results.json ]; then
             echo "test-results.json not found!"
             exit 1
           fi
+
       - name: Validate JSON format
         run: |
           sudo apt-get install -y jq
@@ -42,11 +58,15 @@ jobs:
             echo "Invalid JSON format in test-results.json"
             exit 1
           fi
-      - uses: dorny/test-reporter@v1.4.2
+
+      - name: Report test results
+        uses: dorny/test-reporter@v1.4.2
         with:
           name: test-results
           path: test-results.json
           reporter: flutter-json
-      - uses: VeryGoodOpenSource/very_good_coverage@v1.1.1
+
+      - name: Report coverage
+        uses: VeryGoodOpenSource/very_good_coverage@v1.1.1
         with:
           min_coverage: 0
