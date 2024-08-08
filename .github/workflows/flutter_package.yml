@@ -20,7 +20,7 @@ on:
         required: false
         type: string
         # Setar a versão do Flutter SDK que está sendo utilizado
-        default: "3.3.9"
+        default: "stable"
       working_directory:
         required: false
         type: string
