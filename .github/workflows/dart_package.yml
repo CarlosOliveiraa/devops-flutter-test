@@ -16,7 +16,7 @@ on:
         required: false
         type: string
         # Setar a versão do Dart SDK que está sendo utilizado
-        default: "2.16.2"
+        default: "3.0.3"
       working_directory:
         required: false
         type: string
